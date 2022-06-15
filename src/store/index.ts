@@ -1,6 +1,5 @@
 import { createStore, createLogger, useStore as baseUseStore, Store } from 'vuex'
 import { App, InjectionKey } from 'vue'
-import envHandler from '@lima/env-handler'
 import { modules } from './modules'
 import { IUserState } from '@/store/modules/user/state'
 
@@ -11,11 +10,10 @@ export interface IStore {
 export const key: InjectionKey<Store<IStore>> = Symbol('lima')
 
 // 在开发环境中开启logger
-const plugins = envHandler.isLocal || envHandler.isTest() ? [createLogger()] : []
 export const store: Store<IStore | unknown> = createStore({
     modules,
-    plugins,
-    strict: envHandler.isLocal() || envHandler.isTest()
+    plugins: process.env.NODE_ENV !== 'production' ? [createLogger()] : [], // 在开发环境中开启logger,
+    strict: process.env.NODE_ENV !== 'production' // 严格模式
 })
 
 export function useStore (): Store<IStore> {
